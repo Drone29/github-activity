@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Activity struct {
@@ -38,9 +39,26 @@ func find_values(data any, keys map[string]struct{}, result map[string]string) b
 					return true
 				}
 			}
+
 			// look for nested structures
 			switch nested := v.(type) {
 			case map[string]interface{}, []interface{}:
+				// check composite key
+				for comp_k := range keys {
+					strtok := strings.Split(comp_k, ".")
+					if len(strtok) > 1 && strtok[0] == k {
+						// look for shortened key
+						keys_nested := make(map[string]struct{})
+						res_nested := make(map[string]string)
+						new_key := strings.Join(strtok[1:], ".")
+						keys_nested[new_key] = struct{}{}
+						if find_values(nested, keys_nested, res_nested) {
+							delete(keys, comp_k)
+							result[comp_k] = res_nested[new_key]
+						}
+						break
+					}
+				}
 				if find_values(nested, keys, result) {
 					return true
 				}
@@ -88,7 +106,7 @@ func main() {
 		log.Fatalf("Failed to decode json %v\n", err)
 	}
 
-	vals, ok := FindValues(data, []string{"type", "public", "id", "created_at"})
+	vals, ok := FindValues(data, []string{"type", "public", "id", "created_at", "repo.name"})
 	if !ok {
 		log.Fatalf("Couldn't find all the values\n")
 	}
