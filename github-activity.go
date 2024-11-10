@@ -12,4 +12,6 @@ func main() {
 		return
 	}
 
+	// url := fmt.Sprintf("https://api.github.com/users/%s/events", os.Args[1])
+
 }
