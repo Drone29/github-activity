@@ -53,8 +53,12 @@ func find_values(data any, keys map[string]struct{}, result map[string]string) b
 						new_key := strings.Join(strtok[1:], ".")
 						keys_nested[new_key] = struct{}{}
 						if find_values(nested, keys_nested, res_nested) {
-							delete(keys, comp_k)
 							result[comp_k] = res_nested[new_key]
+
+							delete(keys, comp_k)
+							if len(keys) == 0 {
+								return true
+							}
 						}
 						break
 					}
