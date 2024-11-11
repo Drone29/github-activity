@@ -26,7 +26,7 @@ func main() {
 		log.Fatalf("Failed to decode json %v\n", err)
 	}
 
-	fmt.Printf("%s activity:\n", username)
+	fmt.Printf("%s public activity:\n", username)
 	for _, activity := range activities.Objects {
 		switch activity.Type {
 		case "PushEvent":
@@ -43,6 +43,10 @@ func main() {
 			fmt.Printf("- %s Updated issue status at %s (%s)\n", activity.CreatedAt, activity.Repo.Name, activity.Payload.Issue.State)
 		case "DeleteEvent":
 			fmt.Printf("- %s Deleted %s %s at %s\n", activity.CreatedAt, activity.Payload.RefType, activity.Payload.Ref, activity.Repo.Name)
+		case "WatchEvent":
+			fmt.Printf("- %s Updated watching status to %s (%s)\n", activity.CreatedAt, activity.Repo.Name, activity.Payload.Action)
+		default:
+			fmt.Printf("Unknown activity type %s", activity.Type)
 		}
 	}
 
